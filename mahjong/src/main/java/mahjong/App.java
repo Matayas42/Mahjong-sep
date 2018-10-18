@@ -15,6 +15,7 @@ public final class App {
      */
     public static void main(String[] args) {
 
+        // initialize new set object
         Set set = new Set();
         if (set.readTiles()) {
             if (set.isWinningSet())
