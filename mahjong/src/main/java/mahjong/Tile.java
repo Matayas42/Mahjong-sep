@@ -20,10 +20,9 @@ public class Tile {
 
     // constructor of Tile object
     // throws custom exception if given tile data is invalid
-    public Tile(String inputType, int inputNumber) throws InvalidTileException {
-        type = inputType;
+    public Tile(char inputType, int inputNumber) throws InvalidTileException {
         number = inputNumber;
-        if (isInputTileValid()) {
+        if (isInputTileValid(inputType)) {
             valueIndex = calcTileIndex();
         } else {
             valueIndex = -1;
@@ -33,15 +32,22 @@ public class Tile {
 
     // checks if given string and int values for type and number are in the preset
     // values from the constants
-    private boolean isInputTileValid() {
-        switch (type) {
-        case "Dot":
-        case "Bamboo":
-        case "Character":
+    private boolean isInputTileValid(char inputType) {
+        switch (inputType) {
+        case 'D':
+            type = "Dot";
             return (number >= MIN_NUMBER_BASICS) && (number <= MAX_NUMBER_BASICS);
-        case "Wind":
+        case 'B':
+            type = "Bamboo";
+            return (number >= MIN_NUMBER_BASICS) && (number <= MAX_NUMBER_BASICS);
+        case 'C':
+            type = "Character";
+            return (number >= MIN_NUMBER_BASICS) && (number <= MAX_NUMBER_BASICS);
+        case 'W':
+            type = "Wind";
             return (number >= MIN_NUMBER_WINDS) && (number <= MAX_NUMBER_WINDS);
-        case "Dragon":
+        case 'G':
+            type = "Dragon";
             return (number >= MIN_NUMBER_DRAGONS) && (number <= MAX_NUMBER_DRAGONS);
         default:
             return false;
