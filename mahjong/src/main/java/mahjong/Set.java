@@ -110,23 +110,32 @@ public class Set {
     }
 
     // reads the tiles from the standard console
-    // always first the type than the number
-    // stops reading if you enter "n" for the type of the tile or -1 for ints number
+    // then passes it to next method that creates the Tile Objects
     public boolean readTiles() {
 
         Scanner sc = new Scanner(System.in);
-        char type = ' ';
-        int number = 0;
-        int n = 0;
-        String input;
+        String inputString;
 
         System.out.println("Please enter the tiles of your set seperated by commas and without spaces.");
         System.out.println("B = Bamboo, C = Character, D = Dot, G = Dragon, W = Wind");
         System.out.println("Example: 'C1,C2,C3,C4,C5,C6,C7,D1,D2,D3,D4,D5,D6,D7'");
 
-        input = sc.next();
+        inputString = sc.next();
+        sc.close();
+
+        return fillSetFromString(inputString);
+
+    }
+
+    public boolean fillSetFromString(String input) {
+        
+        char type = ' ';
+        int number = 0;
+        int n = 0;
+
         char tmp[] = input.toCharArray();
 
+        // circle through input string and create Tiles if valid
         for (char c : tmp) {
             if (Character.isAlphabetic(c))
                 type = c;
@@ -135,7 +144,6 @@ public class Set {
             else {
                 if (c != ',') {
                     System.out.println("Invalid input.");
-                    sc.close();
                     return false;
                 }
             }
@@ -148,9 +156,7 @@ public class Set {
                 number = 0;
             }
         }
-
-        sc.close();
-        // return true if there was at least on tile added succesfully
+        // returns true if we found some valid tiles
         return (n > 0);
     }
 
