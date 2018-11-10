@@ -13,6 +13,7 @@ public class Set {
     // subset
     private final int WINNING_SET_NO_OF_TILES = 14;
     private final int SUBSET_NO_OF_TILES = 3;
+	private final int LIMIT = 10;
     // private final int NO_OF_SUBSETS = 5;
 
     private List<Tile> tiles;
@@ -44,7 +45,17 @@ public class Set {
 
         return false;
     }
+	
+	public static boolean isFourOfAKind(List<Tile> input) {
 
+		if (input.size() == 4)
+			if (input.get(0).getValueIndex() == input.get(1).getValueIndex())
+				if (input.get(1).getValueIndex() == input.get(2).getValueIndex())
+					if (input.get(2).getValueIndex() == input.get(3).getValueIndex())
+						return true;
+
+		return false;
+	}
     // static function that checks a presorted subset for being three consecutives
     public static boolean isThreeConsecutive(List<Tile> input) {
 
@@ -262,13 +273,53 @@ public class Set {
 	}
 
 	private boolean isCommonHand() {
-		
-		return false;
+		List<Tile> tmpList = new ArrayList<Tile>(tiles);
+		List<Tile> tmpList2 = new ArrayList<Tile>();
+		List<Tile> subSet;boolean check;
+		//check for the first four subsets with length 3
+		for(int i = 0; i < 4 ; i++){
+			check = false;
+			//is it chow?
+			if(tmpList.size()>3){
+				subSet = tmpList.subList(0, 3);
+				tmpList2 = tmpList.subList(3, tmpList.size());
+				check = isThreeConsecutive(subSet);
+			}
+			if(!check)return false;
+		}
+		return isPair(tmpList2);
 	}
 
 	private boolean isAllInTripletts() {
-
-		return false;
+		List<Tile> tmpList = new ArrayList<Tile>(tiles);
+		List<Tile> tmpList2 = new ArrayList<Tile>();
+		List<Tile> subSet;
+		boolean check;
+		//check for the first four subsets with length 3 or 4
+		for(int i = 0; i < 4 ; i++){
+			check = false;
+			//is it Kong?
+			if(tmpList.size()>4){
+				subSet = tmpList.subList(0, 4);
+				tmpList2 = tmpList.subList(4, tmpList.size());
+				check = isFourOfAKind(subSet);
+				if(check)tmpList = tmpList2;
+			}
+			//if not, is it Pong?
+			if(!check){
+				if(tmpList.size()>3){
+					subSet = tmpList.subList(0, 3);
+					tmpList2 = tmpList.subList(3, tmpList.size());
+					check = isThreeOfAKind(subSet);
+					if(check)tmpList = tmpList2;
+				}else{
+					//not enough molds
+					return false;
+				}
+			}
+			if(!check)return false;	
+		}
+		return isPair(tmpList);
 	}
 
 	private boolean isMixOneSuit() {

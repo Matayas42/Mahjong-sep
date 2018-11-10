@@ -74,5 +74,13 @@ public class Tile {
     public int getNumber() {
         return number;
     }
+	
+	public boolean isHonorTile(){
+    	if(type.equals("Dragon") || type.equals("Wind")){
+    		return true;
+    	}else {
+    		return false;
+    	}
+    }
 
 }
