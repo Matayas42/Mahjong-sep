@@ -14,7 +14,7 @@ public class Set {
     // subset
     private final int WINNING_SET_NO_OF_TILES = 14;
     private final int MAX_NO_OF_SAME_TILE = 4;
-    // private final int SUBSET_NO_OF_TILES = 3;
+	private final int LIMIT = 10;
     // private final int NO_OF_SUBSETS = 5;
 
     private List<Tile> tiles;
@@ -77,7 +77,17 @@ public class Set {
 
         return false;
     }
+	
+	public static boolean isFourOfAKind(List<Tile> input) {
 
+		if (input.size() == 4)
+			if (input.get(0).getValueIndex() == input.get(1).getValueIndex())
+				if (input.get(1).getValueIndex() == input.get(2).getValueIndex())
+					if (input.get(2).getValueIndex() == input.get(3).getValueIndex())
+						return true;
+
+		return false;
+	}
     // static function that checks a presorted subset for being three consecutives
     public static boolean isThreeConsecutive(List<Tile> input) {
 
@@ -317,6 +327,105 @@ public class Set {
 
         return false;
     }
+	public int computeFanPoints() {
+		//no points in this case
+		if(!isWinningSet())return -1;
+		
+		int pointsMax = 0;
+		if(isAllHonorTiles()) pointsMax = pointsMax > LIMIT?pointsMax:LIMIT;
+		if(isGreatDragon()) pointsMax = pointsMax > 8?pointsMax:8;
+		if(isAllOneSuit()) pointsMax = pointsMax > 7?pointsMax:7;
+		if(isCommonHand()) pointsMax = pointsMax > 1?pointsMax:1;
+		if(isAllInTripletts()) pointsMax = pointsMax > 3?pointsMax:3;
+		if(isMixOneSuit()) pointsMax = pointsMax > 3?pointsMax:3;
+		if(isSmallDragon()) pointsMax = pointsMax > 5?pointsMax:5;
+		if(isSevenPairs()) pointsMax = pointsMax > 4?pointsMax:4;
+		
+		//.... some more ...
+		return pointsMax;
+	}
+
+	private boolean isCommonHand() {
+		List<Tile> tmpList = new ArrayList<Tile>(tiles);
+		List<Tile> tmpList2 = new ArrayList<Tile>();
+		List<Tile> subSet;boolean check;
+		//check for the first four subsets with length 3
+		for(int i = 0; i < 4 ; i++){
+			check = false;
+			//is it chow?
+			if(tmpList.size()>3){
+				subSet = tmpList.subList(0, 3);
+				tmpList2 = tmpList.subList(3, tmpList.size());
+				check = isThreeConsecutive(subSet);
+			}
+			if(!check)return false;
+		}
+		return isPair(tmpList2);
+	}
+
+	private boolean isAllInTripletts() {
+		List<Tile> tmpList = new ArrayList<Tile>(tiles);
+		List<Tile> tmpList2 = new ArrayList<Tile>();
+		List<Tile> subSet;
+		boolean check;
+		//check for the first four subsets with length 3 or 4
+		for(int i = 0; i < 4 ; i++){
+			check = false;
+			//is it Kong?
+			if(tmpList.size()>4){
+				subSet = tmpList.subList(0, 4);
+				tmpList2 = tmpList.subList(4, tmpList.size());
+				check = isFourOfAKind(subSet);
+				if(check)tmpList = tmpList2;
+			}
+			//if not, is it Pong?
+			if(!check){
+				if(tmpList.size()>3){
+					subSet = tmpList.subList(0, 3);
+					tmpList2 = tmpList.subList(3, tmpList.size());
+					check = isThreeOfAKind(subSet);
+					if(check)tmpList = tmpList2;
+				}else{
+					//not enough molds
+					return false;
+				}
+			}
+			if(!check)return false;	
+		}
+		return isPair(tmpList);
+	}
+
+	private boolean isMixOneSuit() {
+
+		return false;
+	}
+
+	private boolean isAllOneSuit() {
+
+		return false;
+	}
+
+	private boolean isAllHonorTiles() {
+
+		return false;
+	}
+
+	private boolean isSmallDragon() {
+
+		return false;
+
+	}
+
+	private boolean isGreatDragon() {
+
+		return false;
+	}
+	private boolean isSevenPairs() {
+
+		return false;
+
+	}
+	//.... more forms ....
 
     // adds a given number of random tiles to the current set
     public void addRandomTiles(int n) {
