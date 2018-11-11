@@ -7,6 +7,7 @@ public class Tile {
 
     // constants holding types and number range of existing tiles
     public static final List<String> TILE_TYPES = Arrays.asList("Dot", "Bamboo", "Character", "Wind", "Dragon");
+    public static final List<Character> TILE_SHORTHAND = Arrays.asList('D', 'B', 'C', 'W', 'G');
     private static final int MIN_NUMBER_BASICS = 1;
     private static final int MAX_NUMBER_BASICS = 9;
     private static final int MIN_NUMBER_WINDS = 1;
@@ -54,6 +55,37 @@ public class Tile {
         }
     }
 
+    public static int getNumberRange(char inputType) {
+        switch (inputType) {
+        case 'D':
+        case 'B':
+        case 'C':
+            return MAX_NUMBER_BASICS;
+        case 'W':
+            return MAX_NUMBER_WINDS;
+        case 'G':
+            return MAX_NUMBER_DRAGONS;
+        default:
+            return -1;
+        }
+    }
+
+    /*public int getNumberRange() {
+        char type = getShorthand().charAt(0);
+        switch (type) {
+        case 'D':
+        case 'B':
+        case 'C':
+            return MIN_NUMBER_BASICS;
+        case 'W':
+            return MIN_NUMBER_WINDS;
+        case 'G':
+            return MIN_NUMBER_DRAGONS;
+        default:
+            return -1;
+        }
+    }*/
+
     // calculates an index for our current tile type of all possible tiles
     // from 0 to 32 (33 distinct tiles)
     private int calcTileIndex() {
@@ -74,5 +106,15 @@ public class Tile {
     public int getNumber() {
         return number;
     }
+
+    // returns the shorthand for a tile like G1
+    public String getShorthand() {
+        if (type != "Dragon")
+            return "" + type.charAt(0) + number;
+        else
+            return "G" + number;
+    }
+
+
 
 }
