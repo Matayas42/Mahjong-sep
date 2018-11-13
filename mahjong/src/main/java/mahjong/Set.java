@@ -360,53 +360,72 @@ public class Set {
 		return pointsMax;
 	}
 
-	private List removePair(List l) {
-		List<Tile> tmpList = new ArrayList<Tile>(l);
-		List<Tile> tmpList2 = new ArrayList<Tile>();
-		List<Tile> subSet;
-		boolean check;
-		// check for the first four subsets with length 3
+	//returns null, when no Pair was found (Tripplet considered no Pair)
+	public static List<Tile> removePair(List<Tile> l) {
 		for (int i = 0; i < l.size()-2; i++) {
 			if(isPair(l.subList(i, i+2))){
-				if(!isThreeOfAKind(l.subList(i, i+3)){
+				if(!isThreeOfAKind(l.subList(i, i+3))){
 					l.remove(i + 1);
 					l.remove(i);
 					return l;
+				}else{
+					i++;
+					i++;
 				}
 			}
 		}
+		if(l.size() >= 2){
+			if(isPair(l.subList(l.size()-2,l.size() ))){
+				l.remove(l.size()-1);
+				l.remove(l.size()-1);
+				return l;
+			}
+				
+		}
+		return null;
 	}
-
-	private boolean isCommonHand() {
+	
+	
+	//change to private?
+	public boolean isCommonHand() {
 		List<Tile> tmpList = new ArrayList<Tile>(tiles);
-		List<Tile> tmpList2 = new ArrayList<Tile>();
 		List<Tile> subSet;
+		//get rid of the pair, without pair, no common hand
+		tmpList = removePair(tmpList);
+		if(tmpList == null){
+			return false;
+		}
 		boolean check;
 		// check for the first four subsets with length 3
 		for (int i = 0; i < 4; i++) {
 			check = false;
 			// is it chow?
-			if (tmpList.size() > 3) {
+			if (tmpList.size() >= 3) {
 				subSet = tmpList.subList(0, 3);
-				tmpList2 = tmpList.subList(3, tmpList.size());
+				tmpList = tmpList.subList(3, tmpList.size());
 				check = isThreeConsecutive(subSet);
 			}
 			if (!check)
 				return false;
 		}
-		return isPair(tmpList2);
+		return tmpList.isEmpty();
 	}
 
-	private boolean isAllInTripletts() {
+	public boolean isAllInTripletts() {
 		List<Tile> tmpList = new ArrayList<Tile>(tiles);
 		List<Tile> tmpList2 = new ArrayList<Tile>();
 		List<Tile> subSet;
+		
+		tmpList = removePair(tmpList);
+		if(tmpList == null){
+			return false;
+		}
 		boolean check;
 		// check for the first four subsets with length 3 or 4
 		for (int i = 0; i < 4; i++) {
 			check = false;
 			// is it Kong?
-			if (tmpList.size() > 4) {
+			if (tmpList.size() >= 4) {
 				subSet = tmpList.subList(0, 4);
 				tmpList2 = tmpList.subList(4, tmpList.size());
 				check = isFourOfAKind(subSet);
@@ -415,7 +434,7 @@ public class Set {
 			}
 			// if not, is it Pong?
 			if (!check) {
-				if (tmpList.size() > 3) {
+				if (tmpList.size() >= 3) {
 					subSet = tmpList.subList(0, 3);
 					tmpList2 = tmpList.subList(3, tmpList.size());
 					check = isThreeOfAKind(subSet);
@@ -429,7 +448,7 @@ public class Set {
 			if (!check)
 				return false;
 		}
-		return isPair(tmpList);
+		return tmpList.isEmpty();
 	}
 
 	private boolean isMixOneSuit() {

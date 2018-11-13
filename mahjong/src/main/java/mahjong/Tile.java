@@ -140,5 +140,13 @@ public class Tile {
     }
 
 
+	@Override
+	public String toString() {
+		return "" + type + number;
+	}
+    
+    
+
+
 
 }
