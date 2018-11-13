@@ -17,6 +17,18 @@ public class Tile {
     private int valueIndex;
     private String type;
     private int number;
+    
+    public static void main(String[] args) {
+		try {
+			Tile t = new Tile('G', 1);
+			System.out.println(t.getNumber());
+		} catch (InvalidTileException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+    
 
     // constructor of Tile object
     // throws custom exception if given tile data is invalid
@@ -82,5 +94,9 @@ public class Tile {
     		return false;
     	}
     }
+	
+	public boolean equals(Tile t){
+		return (this.getNumber() == t.getNumber() && this.getType().equals(t.getType()));
+	}
 
 }
