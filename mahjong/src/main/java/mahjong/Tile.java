@@ -120,7 +120,23 @@ public class Tile {
     }
 	
 	public boolean isHonorTile(){
-    	if(type.equals("Dragon") || type.equals("Wind")){
+    	if(isDragon() || isWind()){
+    		return true;
+    	}else {
+    		return false;
+    	}
+    }
+	
+	public boolean isDragon(){
+    	if(type.equals("Dragon")){
+    		return true;
+    	}else {
+    		return false;
+    	}
+    }
+	
+	public boolean isWind(){
+    	if(type.equals("Wind")){
     		return true;
     	}else {
     		return false;
