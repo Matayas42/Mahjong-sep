@@ -44,13 +44,21 @@ public class Test_isAllInTriplets {
 	// not all in triplets
 	public void AllInTripplets4() {
 		Set test = new Set();
-		test.fillSetFromString("C2,C5,C5,D4,D4,D4,D9,D9,D9,W1,W1,W1,G2,G2");
+		test.fillSetFromString("C5,C5,C5,C5,D4,D4,D4,D9,D9,W1,W1,W1,G2,G2");
+		assertFalse(test.isAllInTripletts());
+	}
+	
+	@Test
+	// not all in triplets
+	public void AllInTripplets5() {
+		Set test = new Set();
+		test.fillSetFromString("C5,C5,C5,C5,D4,D4,D5,D9,D9,W1,W1,W1,G2,G2");
 		assertFalse(test.isAllInTripletts());
 	}
 	
 	@Test
 	// 13 tiles
-	public void AllInTripplets5() {
+	public void AllInTripplets6() {
 		Set test = new Set();
 		test.fillSetFromString("C5,C5,C5,D4,D4,D4,D9,D9,D9,W1,W1,W1,G2");
 		assertFalse(test.isAllInTripletts());
@@ -58,7 +66,7 @@ public class Test_isAllInTriplets {
 	
 	@Test
 	// invalid type A5
-	public void AllInTripplets6() {
+	public void AllInTripplets7() {
 		Set test = new Set();
 		test.fillSetFromString("A5,C5,C5,D4,D4,D4,D9,D9,D9,W1,W1,W1,G2,G2");
 		assertFalse(test.isAllInTripletts());
@@ -66,7 +74,7 @@ public class Test_isAllInTriplets {
 	
 	@Test
 	// invalid number D10
-	public void AllInTripplets7() {
+	public void AllInTripplets8() {
 		Set test = new Set();
 		test.fillSetFromString("C5,C5,C5,D4,D4,D4,D9,D9,D10,W1,W1,W1,G2,G2");
 		assertFalse(test.isAllInTripletts());
@@ -74,7 +82,7 @@ public class Test_isAllInTriplets {
 	
 	@Test
 	// too many tile D4
-	public void AllInTripplets8() {
+	public void AllInTripplets9() {
 		Set test = new Set();
 		test.fillSetFromString("C5,C5,C5,D4,D4,D4,D4,D4,D4,W1,W1,W1,G2,G2");
 		assertFalse(test.isAllInTripletts());
