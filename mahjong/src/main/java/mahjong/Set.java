@@ -252,6 +252,11 @@ public class Set {
 			}
 		}
 	}
+	
+	//assistant function for testing
+	public boolean pairLast() {
+		return this.checkPairLast();
+	}
 
 	private boolean checkPairLast() {
 		List<Tile> tmpList = new ArrayList<Tile>(tiles);
@@ -286,7 +291,7 @@ public class Set {
 					}
 				}
 
-				if (i + 2 > tmpList.size())
+				if (i + 2 < tmpList.size())
 					// we're not down to the last two but can't build a sublist
 					// with 3 anymore
 					break;
@@ -302,6 +307,11 @@ public class Set {
 		}
 		return false;
 	}
+	
+	//assistant function for testing
+	public boolean pairFirst() {
+		return this.checkPairFirst();
+	}
 
 	private boolean checkPairFirst() {
 		List<List<Tile>> tmpListList = new ArrayList<List<Tile>>();
@@ -316,6 +326,7 @@ public class Set {
 				tmpListList.add(new ArrayList<Tile>(tiles.subList(0, i)));
 				tmpListList.get(pairsFound).addAll(tiles.subList(i + 2, tiles.size()));
 				pairsFound++;
+				i++;
 			}
 		}
 
