@@ -18,18 +18,7 @@ public class Tile {
     private int valueIndex;
     private String type;
     private int number;
-    
-    public static void main(String[] args) {
-		try {
-			Tile t = new Tile('G', 1);
-			System.out.println(t.getNumber());
-		} catch (InvalidTileException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-	}
-    
+    private int playerIndex = -1; // for the person who threw the tile last
 
     // constructor of Tile object
     // throws custom exception if given tile data is invalid
@@ -117,6 +106,14 @@ public class Tile {
     // basic getter for private member variable
     public int getNumber() {
         return number;
+    }
+
+    public int getPlayerIndex() {
+        return playerIndex;
+    }
+
+    public void setPlayerIndex(int inPlayerIndex) {
+        playerIndex = inPlayerIndex;
     }
 	
 	public boolean isHonorTile(){

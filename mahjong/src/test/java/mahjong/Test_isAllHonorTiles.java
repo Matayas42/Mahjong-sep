@@ -1,15 +1,10 @@
 package mahjong;
 
-import static org.junit.Assert.*;
-
-import java.util.List;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
-
-import mahjong.*;
-import mahjong.Test_isAllOneSuit.Set_stub_false;
-import mahjong.Test_isAllOneSuit.Set_stub_true;
 
 public class Test_isAllHonorTiles {
 

@@ -13,19 +13,25 @@ public class Set {
 	// constants keeping number of tiles in winning set and number of tiles per
 	// subset
 	private final int WINNING_SET_NO_OF_TILES = 14;
-	private final int SUBSET_NO_OF_TILES = 3;
+	// private final int SUBSET_NO_OF_TILES = 3;
 	private final int MAX_NO_OF_SAME_TILE = 4;
 	private final int LIMIT = 10;
 	// private final int NO_OF_SUBSETS = 5;
 
 	private List<Tile> tiles;
 	private int numberOfTiles;
-	private boolean canTakeNew = false;
 	private boolean isHouse = false;
 	private int playerIndex;
 
-	// basic constructor for empty Set Object
+	// basic constructor for empty Set Object, exists for testing purposes
 	public Set() {
+		tiles = new ArrayList<Tile>();
+		numberOfTiles = 0;
+	}
+
+	// constructor for actual gameplay
+	public Set(int playerIdx) {
+		playerIndex = playerIdx;
 		tiles = new ArrayList<Tile>();
 		numberOfTiles = 0;
 	}
@@ -50,13 +56,10 @@ public class Set {
 		return isHouse;
 	}
 
-	public boolean canTakeNew() {
-		if (canTakeNew) {
-			canTakeNew = false;
-			return true;
-		}
-		return false;
-	}
+	/*
+	 * public boolean canTakeNew() { if (canTakeNew) { canTakeNew = false; return
+	 * true; } return false; }
+	 */
 
 	// static function that checks a presorted subset for being a pair
 	public static boolean isPair(List<Tile> input) {
@@ -108,27 +111,32 @@ public class Set {
 	// custom
 	// exception if all possible tiles of that type are already part of our set
 	// it also sorts the tiles before adding the to our list
-	public void addTile(Tile tile) throws InvalidTileException {
+	public boolean addTile(Tile tile, boolean newTile) {
 
 		int addAtIndex = 0;
 
 		// check the Tile database file if there are still tiles like that left
-		// in the
-		// set
-		if (checkDataBase(tile)) {
-			// it's good, now add it at the right position
-			for (Tile t : tiles) {
-				if (t.getValueIndex() < tile.getValueIndex())
-					// the type-index of our new tile is smaller than the one we
-					// are comparing it
-					// to, that means we have to add it before that tile
-					addAtIndex = tiles.indexOf(t) + 1;
+		// in the set
+		try {
+			if (newTile && checkDataBase(tile)) {
+				// it's good, now add it at the right position
+				for (Tile t : tiles) {
+					if (t.getValueIndex() < tile.getValueIndex())
+						// the type-index of our new tile is smaller than the one we
+						// are comparing it
+						// to, that means we have to add it before that tile
+						addAtIndex = tiles.indexOf(t) + 1;
+				}
+				// adding the tile to the list, counting up our current number of
+				// tiles
+				tiles.add(addAtIndex, tile);
+				numberOfTiles++;
+				return true;
 			}
-			// adding the tile to the list, counting up our current number of
-			// tiles
-			tiles.add(addAtIndex, tile);
-			numberOfTiles++;
+		} catch (InvalidTileException e) {	
+			System.out.println(e.getMessage());
 		}
+		return false;
 	}
 
 	private boolean checkDataBase(Tile tile) throws InvalidTileException {
@@ -164,8 +172,7 @@ public class Set {
 	public boolean addTile(char type, int number, boolean printError) {
 		try {
 			Tile tile = new Tile(type, number);
-			addTile(tile);
-			return true;
+			return addTile(tile, true);
 		} catch (InvalidTileException e) {
 			if (printError)
 				System.out.println(e.getMessage());
@@ -252,8 +259,8 @@ public class Set {
 			}
 		}
 	}
-	
-	//assistant function for testing
+
+	// assistant function for testing
 	public boolean pairLast() {
 		return this.checkPairLast();
 	}
@@ -307,8 +314,8 @@ public class Set {
 		}
 		return false;
 	}
-	
-	//assistant function for testing
+
+	// assistant function for testing
 	public boolean pairFirst() {
 		return this.checkPairFirst();
 	}
@@ -710,7 +717,7 @@ public class Set {
 		}
 		return winds;
 	}
-	
+
 	public boolean isAllKongs() {
 		List<Tile> tmpList = new ArrayList<Tile>(tiles);
 		List<Tile> tmpList2 = new ArrayList<Tile>();
@@ -749,6 +756,8 @@ public class Set {
 		int number;
 		// boolean wasSuccessful = true;
 
+		System.out.println("Adding random Tile!");
+
 		for (int i = 0; i < n; i++) {
 			type = Tile.TILE_SHORTHAND.get(r.nextInt(Tile.TILE_SHORTHAND.size()));
 			number = r.nextInt(Tile.getNumberRange(type));
@@ -764,6 +773,7 @@ public class Set {
 		if (index >= 0 && index < tiles.size()) {
 			Tile tmpTile = tiles.get(index);
 			tiles.remove(index);
+			numberOfTiles--;
 			return tmpTile;
 		}
 		return null;
@@ -773,40 +783,83 @@ public class Set {
 		tiles.add(t);
 	}
 
-	public boolean takeTilePossible(Tile input) {
-
-		// we first check for the special Kong case, where you can take and draw
+	public boolean canPong(Tile input) {
 		int count = 0;
+
 		for (Tile t : tiles) {
 			if (input.getValueIndex() == t.getValueIndex()) {
 				count++;
 			}
 		}
-		if (count == 3) {
-			canTakeNew = true;
+
+		if (count == 2) {
 			return true;
 		}
+		return false;
+	}
 
-		// okay no kong so let's see if we have Pong or Chow
+	public boolean canKong(Tile input) {
+		int count = 0;
+
+		for (Tile t : tiles) {
+			if (input.getValueIndex() == t.getValueIndex()) {
+				count++;
+			}
+		}
+
+		if (count == 3) {
+			return true;
+		}
+		return false;
+	}
+
+	public boolean canChow(Tile input) {
 		Set tmpSet = new Set();
 
-		try {
-			tmpSet.addTile(input);
-
-			for (int i = 0; i < numberOfTiles - 1; i++) {
-				tmpSet.addTile(tiles.get(i));
-				tmpSet.addTile(tiles.get(i + 1));
-				if (Set.isThreeConsecutive(tmpSet.getTiles()) || Set.isThreeOfAKind(tmpSet.getTiles())) {
-					return true;
-				}
+		tmpSet.addTile(input, false);
+		for (int i = 0; i < numberOfTiles - 1; i++) {
+			tmpSet.addTile(tiles.get(i), false);
+			tmpSet.addTile(tiles.get(i + 1), false);
+			if (isThreeConsecutive(tmpSet.getTiles())) {
+				return true;
 			}
-
-		} catch (InvalidTileException e) {
-			System.out.println(e.getMessage());
-			return false;
 		}
 
 		return false;
 	}
 
+	public void print() {
+		int i = 0;
+		for (Tile t : tiles) {
+			i++;
+			System.out.print(t.getShorthand());
+			if (i < numberOfTiles) {
+				System.out.print(",");
+			}
+		}
+		System.out.println();
+	}
+
+	/*
+	 * public boolean takeTilePossible(Tile input) {
+	 * 
+	 * // we first check for the special Kong case, where you can take and draw int
+	 * count = 0; for (Tile t : tiles) { if (input.getValueIndex() ==
+	 * t.getValueIndex()) { count++; } } if (count == 3) { canTakeNew = true; return
+	 * true; }
+	 * 
+	 * // okay no kong so let's see if we have Pong or Chow Set tmpSet = new Set();
+	 * 
+	 * try { tmpSet.addTile(input);
+	 * 
+	 * for (int i = 0; i < numberOfTiles - 1; i++) { tmpSet.addTile(tiles.get(i));
+	 * tmpSet.addTile(tiles.get(i + 1)); if
+	 * (Set.isThreeConsecutive(tmpSet.getTiles()) ||
+	 * Set.isThreeOfAKind(tmpSet.getTiles())) { return true; } }
+	 * 
+	 * } catch (InvalidTileException e) { System.out.println(e.getMessage()); return
+	 * false; }
+	 * 
+	 * return false; }
+	 */
 }
