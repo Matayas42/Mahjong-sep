@@ -1,6 +1,8 @@
-package mahjong_test;
+package mahjong;
 
 import static org.junit.Assert.*;
+
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -17,20 +19,28 @@ public class Test_isGreatDragon {
 	
 	@Test
 	// simply true
-	public void greatDragon1() {
+	public void greatDragon1() throws Exception {
 		Set test = new Set();
 		test.fillSetFromString("C1,C1,C1,G3,G3,G3,G1,G1,G1,G2,G2,G2,W1,W1");
-		boolean res = test.tryGreatDragon();
-		assertTrue(res);
+		List<List<Meld>> listToTest = test.allPossibleHands(test.getTiles());
+		boolean check = false;
+		for (List<Meld> meldList : listToTest) {
+			if(test.isGreatDragon(meldList))check = true;
+		}
+		assertTrue(check);
 	}
 	
 	@Test
 	// ONLY 2 dragon molds
-	public void greatDragon2() {
+	public void greatDragon2() throws Exception {
 		Set test = new Set();
 		test.fillSetFromString("C1,C1,C1,D2,D2,D2,G1,G1,G1,G2,G2,G2,G3,G3");
-		boolean res = test.tryGreatDragon();
-		assertFalse(res);
+		List<List<Meld>> listToTest = test.allPossibleHands(test.getTiles());
+		boolean check = false;
+		for (List<Meld> meldList : listToTest) {
+			if(test.isGreatDragon(meldList))check = true;
+		}
+		assertFalse(check);
 	}
 	
 }

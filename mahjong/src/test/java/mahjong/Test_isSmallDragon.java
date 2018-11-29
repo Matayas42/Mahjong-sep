@@ -1,4 +1,4 @@
-package mahjong_test;
+package mahjong;
 
 import static org.junit.Assert.*;
 
@@ -18,29 +18,41 @@ public class Test_isSmallDragon {
 	
 	@Test
 	// simply true
-	public void smallDragon1() {
+	public void smallDragon1() throws Exception{
 		Set test = new Set();
 		test.fillSetFromString("C1,C1,C1,D2,D2,D2,G1,G1,G1,G2,G2,G2,G3,G3");
-		boolean res = test.trySmallDragon();
-		assertTrue(res);
+		List<List<Meld>> listToTest = test.allPossibleHands(test.getTiles());
+		boolean check = false;
+		for (List<Meld> meldList : listToTest) {
+			if(test.isSmallDragon(meldList))check = true;
+		}
+		assertTrue(check);
 	}
 	
 	@Test
 	// pair not in G
-	public void smallDragon2() {
+	public void smallDragon2() throws Exception{
 		Set test = new Set();
 		test.fillSetFromString("C1,C1,C1,D2,D2,D2,G1,G1,G1,G2,G2,G2,W1,W1");
-		boolean res = test.trySmallDragon();
-		assertFalse(res);
+		List<List<Meld>> listToTest = test.allPossibleHands(test.getTiles());
+		boolean check = false;
+		for (List<Meld> meldList : listToTest) {
+			if(test.isSmallDragon(meldList))check = true;
+		}
+		assertFalse(check);
 	}
 	
 	@Test
 	// only 1 dragon mold
-	public void smallDragon3() {
+	public void smallDragon3() throws Exception{
 		Set test = new Set();
 		test.fillSetFromString("C1,C1,C1,D2,D2,D2,B1,B1,B1,G2,G2,G2,G1,G1");
-		boolean res = test.trySmallDragon();
-		assertFalse(res);
+		List<List<Meld>> listToTest = test.allPossibleHands(test.getTiles());
+		boolean check = false;
+		for (List<Meld> meldList : listToTest) {
+			if(test.isSmallDragon(meldList))check = true;
+		}
+		assertFalse(check);
 	}
 	
 }
