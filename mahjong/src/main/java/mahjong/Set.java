@@ -7,31 +7,26 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
+import java.util.Stack;
 
 public class Set {
 
 	// constants keeping number of tiles in winning set and number of tiles per
 	// subset
 	private final int WINNING_SET_NO_OF_TILES = 14;
-	// private final int SUBSET_NO_OF_TILES = 3;
+	private final int SUBSET_NO_OF_TILES = 3;
 	private final int MAX_NO_OF_SAME_TILE = 4;
 	private final int LIMIT = 10;
 	// private final int NO_OF_SUBSETS = 5;
 
 	private List<Tile> tiles;
 	private int numberOfTiles;
+	private boolean canTakeNew = false;
 	private boolean isHouse = false;
 	private int playerIndex;
 
-	// basic constructor for empty Set Object, exists for testing purposes
+	// basic constructor for empty Set Object
 	public Set() {
-		tiles = new ArrayList<Tile>();
-		numberOfTiles = 0;
-	}
-
-	// constructor for actual gameplay
-	public Set(int playerIdx) {
-		playerIndex = playerIdx;
 		tiles = new ArrayList<Tile>();
 		numberOfTiles = 0;
 	}
@@ -56,10 +51,13 @@ public class Set {
 		return isHouse;
 	}
 
-	/*
-	 * public boolean canTakeNew() { if (canTakeNew) { canTakeNew = false; return
-	 * true; } return false; }
-	 */
+	public boolean canTakeNew() {
+		if (canTakeNew) {
+			canTakeNew = false;
+			return true;
+		}
+		return false;
+	}
 
 	// static function that checks a presorted subset for being a pair
 	public static boolean isPair(List<Tile> input) {
@@ -111,32 +109,27 @@ public class Set {
 	// custom
 	// exception if all possible tiles of that type are already part of our set
 	// it also sorts the tiles before adding the to our list
-	public boolean addTile(Tile tile, boolean newTile) {
+	public void addTile(Tile tile) throws InvalidTileException {
 
 		int addAtIndex = 0;
 
 		// check the Tile database file if there are still tiles like that left
-		// in the set
-		try {
-			if (newTile && checkDataBase(tile)) {
-				// it's good, now add it at the right position
-				for (Tile t : tiles) {
-					if (t.getValueIndex() < tile.getValueIndex())
-						// the type-index of our new tile is smaller than the one we
-						// are comparing it
-						// to, that means we have to add it before that tile
-						addAtIndex = tiles.indexOf(t) + 1;
-				}
-				// adding the tile to the list, counting up our current number of
-				// tiles
-				tiles.add(addAtIndex, tile);
-				numberOfTiles++;
-				return true;
+		// in the
+		// set
+		if (checkDataBase(tile)) {
+			// it's good, now add it at the right position
+			for (Tile t : tiles) {
+				if (t.getValueIndex() < tile.getValueIndex())
+					// the type-index of our new tile is smaller than the one we
+					// are comparing it
+					// to, that means we have to add it before that tile
+					addAtIndex = tiles.indexOf(t) + 1;
 			}
-		} catch (InvalidTileException e) {	
-			System.out.println(e.getMessage());
+			// adding the tile to the list, counting up our current number of
+			// tiles
+			tiles.add(addAtIndex, tile);
+			numberOfTiles++;
 		}
-		return false;
 	}
 
 	private boolean checkDataBase(Tile tile) throws InvalidTileException {
@@ -172,7 +165,8 @@ public class Set {
 	public boolean addTile(char type, int number, boolean printError) {
 		try {
 			Tile tile = new Tile(type, number);
-			return addTile(tile, true);
+			addTile(tile);
+			return true;
 		} catch (InvalidTileException e) {
 			if (printError)
 				System.out.println(e.getMessage());
@@ -260,11 +254,6 @@ public class Set {
 		}
 	}
 
-	// assistant function for testing
-	public boolean pairLast() {
-		return this.checkPairLast();
-	}
-
 	private boolean checkPairLast() {
 		List<Tile> tmpList = new ArrayList<Tile>(tiles);
 		List<Tile> tmpList2;
@@ -298,7 +287,7 @@ public class Set {
 					}
 				}
 
-				if (i + 2 < tmpList.size())
+				if (i + 2 > tmpList.size())
 					// we're not down to the last two but can't build a sublist
 					// with 3 anymore
 					break;
@@ -315,11 +304,6 @@ public class Set {
 		return false;
 	}
 
-	// assistant function for testing
-	public boolean pairFirst() {
-		return this.checkPairFirst();
-	}
-
 	private boolean checkPairFirst() {
 		List<List<Tile>> tmpListList = new ArrayList<List<Tile>>();
 		List<Tile> tmpList;
@@ -333,7 +317,6 @@ public class Set {
 				tmpListList.add(new ArrayList<Tile>(tiles.subList(0, i)));
 				tmpListList.get(pairsFound).addAll(tiles.subList(i + 2, tiles.size()));
 				pairsFound++;
-				i++;
 			}
 		}
 
@@ -358,395 +341,323 @@ public class Set {
 		return false;
 	}
 
+
+	public List<List<Meld>> allPossibleHands(List<Tile> list) throws Exception {
+		Stack<Melds> toIterate = new Stack();
+		Melds first = new Melds(list);
+		toIterate.push(first);
+		List<List<Meld>> endresults = new ArrayList<List<Meld>>();
+		while (!toIterate.isEmpty()) {
+			Melds pair = toIterate.pop();
+			List<Meld> meldList = pair.getMelds();
+			List<Tile> restTiles = pair.getRestTiles();
+			// get all Pairs in restTiles
+			for (int i = 0; i < restTiles.size(); i++) {
+				for (int j = i + 1; j < restTiles.size(); j++) {
+					if (restTiles.get(i).equals(restTiles.get(j))) {
+						Melds meldsNew = makeNewMelds("Eyes", i, j, -1, -1, meldList, restTiles);
+						if (meldsNew.getRestTiles().isEmpty()) {
+							endresults.add(meldsNew.getMelds());
+						} else {
+							toIterate.push(meldsNew);
+						}
+					}
+					for (int k = j + 1; k < restTiles.size(); k++) {
+						if (restTiles.get(i).equals(restTiles.get(j)) && restTiles.get(j).equals(restTiles.get(k))) {
+							Melds meldsNew = makeNewMelds("Pong", i, j, k, -1, meldList, restTiles);
+							if (meldsNew.getRestTiles().isEmpty()) {
+								endresults.add(meldsNew.getMelds());
+							} else {
+								toIterate.push(meldsNew);
+							}
+						}
+						Tile Ti = restTiles.get(i);
+						Tile Tj = restTiles.get(j);
+						Tile Tk = restTiles.get(k);
+						if (Ti.getNumber() == Tj.getNumber() - 1 && Tj.getNumber() == Tk.getNumber() - 1
+								&& Ti.getType().equals(Tj.getType()) && Tj.getType().equals(Tk.getType())) {
+							Melds meldsNew = makeNewMelds("Chow", i, j, k, -1, meldList, restTiles);
+							if (meldsNew.getRestTiles().isEmpty()) {
+								endresults.add(meldsNew.getMelds());
+							} else {
+								toIterate.push(meldsNew);
+							}
+						}
+						for (int l = k + 1; l < restTiles.size(); l++) {
+							if (restTiles.get(i).equals(restTiles.get(j)) && restTiles.get(j).equals(restTiles.get(k))
+									&& restTiles.get(k).equals(restTiles.get(l))) {
+								Melds meldsNew = makeNewMelds("Kong", i, j, k, l, meldList, restTiles);
+								if (meldsNew.getRestTiles().isEmpty()) {
+									endresults.add(meldsNew.getMelds());
+								} else {
+									toIterate.push(meldsNew);
+									for (Tile t : meldsNew.getRestTiles()) {
+										System.out.println(" " + t);
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		return endresults;
+	}
+
+	private static Melds makeNewMelds(String meldType, int i, int j, int k, int l, List<Meld> meldList,
+			List<Tile> restTiles) throws Exception {
+		Meld m = new Meld(meldType, restTiles.get(i));
+		List<Meld> meldListNew = new ArrayList<Meld>();
+		meldListNew.addAll(meldList);
+		meldListNew.add(m);
+		List<Tile> restTilesNew = new ArrayList<Tile>();
+		restTilesNew.addAll(restTiles);
+		if (m.isKong()) {
+			restTilesNew.remove(l);
+			restTilesNew.remove(k);
+		} else if (m.isPong() || m.isChow()) {
+			restTilesNew.remove(k);
+		}
+		restTilesNew.remove(j);
+		restTilesNew.remove(i);
+		return new Melds(meldListNew, restTilesNew);
+	}
+
 	public int computeFanPoints() {
-		// no points in this case
-		if (!isWinningSet())
-			return -1;
-
-		int pointsMax = 0;
-		if (isAllHonorTiles())
-			pointsMax = pointsMax > LIMIT ? pointsMax : LIMIT;
-		if (isGreatDragon())
-			pointsMax = pointsMax > 8 ? pointsMax : 8;
-		if (isAllOneSuit())
-			pointsMax = pointsMax > 7 ? pointsMax : 7;
-		if (isCommonHand())
-			pointsMax = pointsMax > 1 ? pointsMax : 1;
-		if (isAllInTripletts())
-			pointsMax = pointsMax > 3 ? pointsMax : 3;
-		if (isMixOneSuit())
-			pointsMax = pointsMax > 3 ? pointsMax : 3;
-		if (isSmallDragon())
-			pointsMax = pointsMax > 5 ? pointsMax : 5;
-		if (isSevenPairs())
-			pointsMax = pointsMax > 4 ? pointsMax : 4;
-		if (isSmallWinds())
-			pointsMax = pointsMax > LIMIT ? pointsMax : LIMIT;
-		if (isGreatWinds())
-			pointsMax = pointsMax > LIMIT ? pointsMax : LIMIT;
-		if (isAllKongs())
-			pointsMax = pointsMax > LIMIT ? pointsMax : LIMIT;
-
-		// .... some more ...
-		return pointsMax;
-	}
-
-	// returns null, when no Pair was found (Tripplet considered no Pair)
-	public static List<Tile> removePair(List<Tile> l) {
-		for (int i = 0; i < l.size() - 2; i++) {
-			if (isPair(l.subList(i, i + 2))) {
-				if (!isThreeOfAKind(l.subList(i, i + 3))) {
-					l.remove(i + 1);
-					l.remove(i);
-					return l;
+		try {
+			List<List<Meld>> allPossibleMelds = allPossibleHands(tiles);
+			int pointsMax = 0;
+			for (List<Meld> meldList : allPossibleMelds) {
+				if (meldList.size() == 5) {
+					if (isAllHonorTiles(meldList))
+						pointsMax = pointsMax > LIMIT ? pointsMax : LIMIT;
+					if (isGreatDragon(meldList))
+						pointsMax = pointsMax > 8 ? pointsMax : 8;
+					if (isAllOneSuit(meldList))
+						pointsMax = pointsMax > 7 ? pointsMax : 7;
+					if (isCommonHand(meldList))
+						pointsMax = pointsMax > 1 ? pointsMax : 1;
+					if (isAllInTripletts(meldList))
+						pointsMax = pointsMax > 3 ? pointsMax : 3;
+					if (isMixOneSuit(meldList))
+						pointsMax = pointsMax > 3 ? pointsMax : 3;
+					if (isSmallDragon(meldList))
+						pointsMax = pointsMax > 5 ? pointsMax : 5;
+					if (isSmallWinds(meldList))
+						pointsMax = pointsMax > LIMIT ? pointsMax : LIMIT;
+					if (isGreatWinds(meldList))
+						pointsMax = pointsMax > LIMIT ? pointsMax : LIMIT;
+					if (isAllKongs(meldList))
+						pointsMax = pointsMax > LIMIT ? pointsMax : LIMIT;
+					if (isAllOrphans(meldList))
+						pointsMax = pointsMax > LIMIT ? pointsMax : LIMIT;
 				} else {
-					i++;
-					i++;
+					if (isSevenPairs(meldList))
+						pointsMax = pointsMax > 4 ? pointsMax : 4;
 				}
 			}
-		}
-		if (l.size() >= 2) {
-			if (isPair(l.subList(l.size() - 2, l.size()))) {
-				l.remove(l.size() - 1);
-				l.remove(l.size() - 1);
-				return l;
-			}
 
+			return pointsMax;
+		} catch (Exception e) {
+			System.out.println("A very evil exception has occured, please continiu playing, bugs may crawl out.");
+			e.printStackTrace();
 		}
-		return null;
+		return 0;
+
 	}
 
-	// null, when no Pair found
-	public static Tile getPairType(List<Tile> l) {
-		for (int i = 0; i < l.size() - 2; i++) {
-			if (isPair(l.subList(i, i + 2))) {
-				if (!isThreeOfAKind(l.subList(i, i + 3))) {
-					return l.get(i);
-				} else {
-					i++;
-					i++;
-				}
+	public boolean isAllOrphans(List<Meld> meldList) {
+		int eyes = 0;
+		int melds = 0;
+		for (Meld m : meldList) {
+			if(m.getTile().getNumber() != 1 && m.getTile().getNumber() != 9)return false;
+			if (m.isEyes()){
+				eyes++;
+			}else if(m.isKong() || m.isPong()){
+				melds++;
 			}
 		}
-		if (l.size() >= 2) {
-			if (isPair(l.subList(l.size() - 2, l.size()))) {
-				return l.get(l.size() - 2);
-			}
-		}
-		return null;
+		return (eyes == 1 && melds == 4);
 	}
 
-	// change to private?
-	public boolean isCommonHand() {
-		List<Tile> tmpList = new ArrayList<Tile>(tiles);
-		List<Tile> subSet;
-		// get rid of the pair, without pair, no common hand
-		tmpList = removePair(tmpList);
-		if (tmpList == null) {
-			return false;
+	public boolean isAllKongs(List<Meld> meldList) {
+		int eyes = 0;
+		int kongs = 0;
+		for (Meld m : meldList) {
+			if (m.isKong())
+				kongs++;
+			if (m.isEyes())
+				eyes++;
 		}
-		boolean check;
-		// check for the first four subsets with length 3
-		for (int i = 0; i < 4; i++) {
-			check = false;
-			// is it chow?
-			if (tmpList.size() >= 3) {
-				subSet = tmpList.subList(0, 3);
-				tmpList = tmpList.subList(3, tmpList.size());
-				check = isThreeConsecutive(subSet);
-			}
-			if (!check)
+		return (eyes == 1 && kongs == 4);
+	}
+
+	public boolean isGreatWinds(List<Meld> meldList) {
+		int eyes = 0;
+		int windmelds = 0;
+		for (Meld m : meldList) {
+			if (m.isEyes()) {
+				eyes++;
+			} else if (!m.getTile().isWind()) {
 				return false;
+			} else {
+				windmelds++;
+			}
 		}
-		return tmpList.isEmpty();
+		return (eyes == 1 && windmelds == 4);
 	}
 
-	public boolean isAllInTripletts() {
-		List<Tile> tmpList = new ArrayList<Tile>(tiles);
-		List<Tile> tmpList2 = new ArrayList<Tile>();
-		List<Tile> subSet;
-
-		tmpList = removePair(tmpList);
-		if (tmpList == null) {
-			return false;
-		}
-		boolean check;
-		// check for the first four subsets with length 3 or 4
-		for (int i = 0; i < 4; i++) {
-			check = false;
-			// is it Kong?
-			if (tmpList.size() >= 4) {
-				subSet = tmpList.subList(0, 4);
-				tmpList2 = tmpList.subList(4, tmpList.size());
-				check = isFourOfAKind(subSet);
-				if (check)
-					tmpList = tmpList2;
-			}
-			// if not, is it Pong?
-			if (!check) {
-				if (tmpList.size() >= 3) {
-					subSet = tmpList.subList(0, 3);
-					tmpList2 = tmpList.subList(3, tmpList.size());
-					check = isThreeOfAKind(subSet);
-					if (check)
-						tmpList = tmpList2;
-				} else {
-					// not enough molds
+	public boolean isSmallWinds(List<Meld> meldList) {
+		int eyes = 0;
+		int windmelds = 0;
+		for (Meld m : meldList) {
+			if (m.isEyes()) {
+				if (!m.getTile().isWind()) {
 					return false;
 				}
+				eyes++;
+			} else if (m.getTile().isWind()) {
+				windmelds++;
 			}
-			if (!check)
+		}
+		return (eyes == 1 && windmelds >= 3);
+	}
+
+	public boolean isSevenPairs(List<Meld> meldList) {
+		int eyes = 0;
+		for (Meld m : meldList) {
+			if (m.isEyes()) {
+				eyes++;
+			} else {
 				return false;
-		}
-		return tmpList.isEmpty();
-	}
-
-	// WINNING SET HAS TO WORK PROPERLY!!!
-	public boolean isMixOneSuit() {
-		if (this.isWinningSet()) {
-			List<Tile> tmpList = new ArrayList<Tile>(tiles);
-			Tile first = null;
-			boolean check = false;
-			for (Tile t : tmpList) {
-				if (!t.isHonorTile()) {
-					first = t;
-					check = true;
-					break;
-				}
 			}
-			for (Tile t : tmpList) {
-				if (!t.isHonorTile()) {
-					if (!check) {
-						return false;
-					} else if (!t.getType().equals(first.getType())) {
-						return false;
-					}
-				}
-			}
-			return true;
-		} else {
-			return false;
 		}
+		return eyes == 7;
 	}
 
-	// WINNING SET HAS TO WORK PROPERLY!!!
-	public boolean isAllOneSuit() {
-		if (this.isWinningSet()) {
-			List<Tile> tmpList = new ArrayList<Tile>(tiles);
-			Tile first = tmpList.get(0);
-			for (Tile t : tmpList) {
-				if (!t.getType().equals(first.getType())) {
-					return false;
-				}
-			}
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	// WINNING SET HAS TO WORK PROPERLY!!!
-	public boolean isAllHonorTiles() {
-		if (this.isWinningSet()) {
-			List<Tile> tmpList = new ArrayList<Tile>(tiles);
-			for (Tile t : tmpList) {
-				if (!t.isHonorTile()) {
-					return false;
-				}
-			}
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	private boolean isSmallDragon() {
-		int dragons = this.dragonMolds();
-		if (dragons == 2 && getPairType(new ArrayList<Tile>(tiles)).isDragon()) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	private boolean isGreatDragon() {
-		int dragons = this.dragonMolds();
-		if (dragons == 3) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	// return 0 if it cannot be a big or small dragon, otherwise the amount of
-	// dragon molds
-	private int dragonMolds() {
-		List<Tile> tmpList = new ArrayList<Tile>(tiles);
-		List<Tile> tmpList2 = new ArrayList<Tile>();
-		List<Tile> subSet;
+	public boolean isSmallDragon(List<Meld> meldList) {
+		int eyes = 0;
 		int dragons = 0;
-		tmpList = removePair(tmpList);
-		if (tmpList == null) {
-			return -1;
-		}
-		boolean check;
-		// check for the first four subsets with length 3 or 4
-		for (int i = 0; i < 4; i++) {
-			check = false;
-			// is it Kong?
-			if (tmpList.size() >= 4) {
-				subSet = tmpList.subList(0, 4);
-				tmpList2 = tmpList.subList(4, tmpList.size());
-				check = isFourOfAKind(subSet);
-				if (check) {
-					tmpList = tmpList2;
-					if (subSet.get(0).isDragon()) {
-						dragons++;
-					}
-				}
-			}
-			// if not, is it Pong?
-			if (!check) {
-				if (tmpList.size() >= 3) {
-					subSet = tmpList.subList(0, 3);
-					tmpList2 = tmpList.subList(3, tmpList.size());
-					check = isThreeOfAKind(subSet);
-					if (check) {
-						tmpList = tmpList2;
-						if (subSet.get(0).isDragon()) {
-							dragons++;
-						}
-					}
-				} else {
-					// not enough molds
-					return -1;
-				}
-			}
-			if (!check)
-				return -1;
-		}
-		return dragons;
-	}
-
-	private boolean isSevenPairs() {
-		List<Tile> tmpList = new ArrayList<Tile>(tiles);
-		List<Tile> tmpList2 = new ArrayList<Tile>();
-		if (tmpList.size() != 14) {
-			return false;
-		} else {
-			for (int i = 0; i < 14; i = i + 2) {
-				if (tmpList.get(i).equals(tmpList.get(i + 1))) {
-					tmpList2.add(tmpList.get(i));
-				} else {
+		int melds = 0;
+		for (Meld m : meldList) {
+			if (m.isEyes()) {
+				if (!m.getTile().isDragon()) {
 					return false;
 				}
+				eyes++;
+			} else if (m.getTile().isDragon()) {
+				dragons++;
+			} else {
+				melds++;
 			}
-			while (!tmpList2.isEmpty()) {
-				Tile first = tmpList2.remove(0);
-				for (Tile t : tmpList2) {
-					if (t.equals(first))
-						return false;
-				}
-			}
-			return true;
 		}
+		return (eyes == 1 && dragons >= 2 && melds + dragons == 4);
 	}
 
-	private boolean isSmallWinds() {
-		int winds = this.windMolds();
-		if (winds == 3 && getPairType(new ArrayList<Tile>(tiles)).isWind()) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	private boolean isGreatWinds() {
-		int winds = this.windMolds();
-		if (winds == 3) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	private int windMolds() {
-		List<Tile> tmpList = new ArrayList<Tile>(tiles);
-		List<Tile> tmpList2 = new ArrayList<Tile>();
-		List<Tile> subSet;
-		int winds = 0;
-		tmpList = removePair(tmpList);
-		if (tmpList == null) {
-			return -1;
-		}
-		boolean check;
-		// check for the first four subsets with length 3 or 4
-		for (int i = 0; i < 4; i++) {
-			check = false;
-			// is it Kong?
-			if (tmpList.size() >= 4) {
-				subSet = tmpList.subList(0, 4);
-				tmpList2 = tmpList.subList(4, tmpList.size());
-				check = isFourOfAKind(subSet);
-				if (check) {
-					tmpList = tmpList2;
-					if (subSet.get(0).isWind()) {
-						winds++;
-					}
-				}
-			}
-			// if not, is it Pong?
-			if (!check) {
-				if (tmpList.size() >= 3) {
-					subSet = tmpList.subList(0, 3);
-					tmpList2 = tmpList.subList(3, tmpList.size());
-					check = isThreeOfAKind(subSet);
-					if (check) {
-						tmpList = tmpList2;
-						if (subSet.get(0).isWind()) {
-							winds++;
-						}
-					}
-				} else {
-					// not enough molds
-					return -1;
-				}
-			}
-			if (!check)
-				return -1;
-		}
-		return winds;
-	}
-
-	public boolean isAllKongs() {
-		List<Tile> tmpList = new ArrayList<Tile>(tiles);
-		List<Tile> tmpList2 = new ArrayList<Tile>();
-		List<Tile> subSet;
-
-		tmpList = removePair(tmpList);
-		if (tmpList == null) {
-			return false;
-		}
-		boolean check;
-		// check for the first four subsets with length 4
-		for (int i = 0; i < 4; i++) {
-			check = false;
-			// is it Kong?
-			if (tmpList.size() >= 4) {
-				subSet = tmpList.subList(0, 4);
-				tmpList2 = tmpList.subList(4, tmpList.size());
-				check = isFourOfAKind(subSet);
-				if (check)
-					tmpList = tmpList2;
-			}
-			if (!check) {
+	public boolean isMixOneSuit(List<Meld> meldList) {
+		int eyes = 0;
+		int melds = 0;
+		boolean check = false;
+		String suit = "";
+		for (Meld m : meldList) {
+			if(m.getTile().isHonorTile()){
+				
+			}else if(!check){
+				suit = m.getTile().toString();
+			}else if(!m.getTile().equals(suit)){
 				return false;
 			}
+			if (m.isEyes()) {
+				eyes++;
+			} else {
+				melds++;
+			}
 		}
-		return tmpList.isEmpty();
+		return (eyes == 1 && melds == 4);
 	}
 
-	// .... more forms .... All orphans, Thirteen Orphans, Nine Gates Hand
+	public boolean isAllInTripletts(List<Meld> meldList) {
+		int eyes = 0;
+		int melds = 0;
+		for (Meld m : meldList) {
+			if (m.isChow())
+				return false;
+			if (m.isEyes()) {
+				eyes++;
+			} else {
+				melds++;
+			}
+		}
+		return (eyes == 1 && melds == 4);
+	}
+
+	public boolean isCommonHand(List<Meld> meldList) {
+		int eyes = 0;
+		int chows = 0;
+		for (Meld m : meldList) {
+			if (m.isChow())
+				chows++;
+			if (m.isEyes())
+				eyes++;
+		}
+		return (eyes == 1 && chows == 4);
+	}
+
+	public boolean isAllOneSuit(List<Meld> meldList) {
+		int eyes = 0;
+		int melds = 0;
+		if (meldList.isEmpty())
+			return false;
+		String suit = meldList.get(0).getTile().getType();
+		for (Meld m : meldList) {
+			if (!m.getTile().getType().equals(suit)) {
+				return false;
+			} else {
+				suit = m.getTile().getType();
+				if (m.isEyes()) {
+					eyes++;
+				} else {
+					melds++;
+				}
+			}
+		}
+		return (eyes == 1 && melds == 4);
+	}
+
+	public boolean isGreatDragon(List<Meld> meldList) {
+		int eyes = 0;
+		int dragons = 0;
+		int melds = 0;
+		for (Meld m : meldList) {
+			if (m.isEyes()) {
+				eyes++;
+			} else if (m.getTile().isDragon()) {
+				dragons++;
+			} else {
+				melds++;
+			}
+		}
+		return (eyes == 1 && dragons == 3 && melds == 1);
+	}
+
+	public boolean isAllHonorTiles(List<Meld> meldList) {
+		int eyes = 0;
+		int melds = 0;
+		for (Meld m : meldList) {
+			if (!m.getTile().isHonorTile()) {
+				return false;
+			} else {
+				if (m.isEyes()) {
+					eyes++;
+				} else {
+					melds++;
+				}
+			}
+		}
+		return (eyes == 1 && melds == 4);
+	}
+
+	
 
 	// adds a given number of random tiles to the current set
 	public void addRandomTiles(int n) {
@@ -755,8 +666,6 @@ public class Set {
 		char type;
 		int number;
 		// boolean wasSuccessful = true;
-
-		System.out.println("Adding random Tile!");
 
 		for (int i = 0; i < n; i++) {
 			type = Tile.TILE_SHORTHAND.get(r.nextInt(Tile.TILE_SHORTHAND.size()));
@@ -773,7 +682,6 @@ public class Set {
 		if (index >= 0 && index < tiles.size()) {
 			Tile tmpTile = tiles.get(index);
 			tiles.remove(index);
-			numberOfTiles--;
 			return tmpTile;
 		}
 		return null;
@@ -783,83 +691,40 @@ public class Set {
 		tiles.add(t);
 	}
 
-	public boolean canPong(Tile input) {
-		int count = 0;
+	public boolean takeTilePossible(Tile input) {
 
+		// we first check for the special Kong case, where you can take and draw
+		int count = 0;
 		for (Tile t : tiles) {
 			if (input.getValueIndex() == t.getValueIndex()) {
 				count++;
 			}
 		}
-
-		if (count == 2) {
-			return true;
-		}
-		return false;
-	}
-
-	public boolean canKong(Tile input) {
-		int count = 0;
-
-		for (Tile t : tiles) {
-			if (input.getValueIndex() == t.getValueIndex()) {
-				count++;
-			}
-		}
-
 		if (count == 3) {
+			canTakeNew = true;
 			return true;
 		}
-		return false;
-	}
 
-	public boolean canChow(Tile input) {
+		// okay no kong so let's see if we have Pong or Chow
 		Set tmpSet = new Set();
 
-		tmpSet.addTile(input, false);
-		for (int i = 0; i < numberOfTiles - 1; i++) {
-			tmpSet.addTile(tiles.get(i), false);
-			tmpSet.addTile(tiles.get(i + 1), false);
-			if (isThreeConsecutive(tmpSet.getTiles())) {
-				return true;
+		try {
+			tmpSet.addTile(input);
+
+			for (int i = 0; i < numberOfTiles - 1; i++) {
+				tmpSet.addTile(tiles.get(i));
+				tmpSet.addTile(tiles.get(i + 1));
+				if (Set.isThreeConsecutive(tmpSet.getTiles()) || Set.isThreeOfAKind(tmpSet.getTiles())) {
+					return true;
+				}
 			}
+
+		} catch (InvalidTileException e) {
+			System.out.println(e.getMessage());
+			return false;
 		}
 
 		return false;
 	}
 
-	public void print() {
-		int i = 0;
-		for (Tile t : tiles) {
-			i++;
-			System.out.print(t.getShorthand());
-			if (i < numberOfTiles) {
-				System.out.print(",");
-			}
-		}
-		System.out.println();
-	}
-
-	/*
-	 * public boolean takeTilePossible(Tile input) {
-	 * 
-	 * // we first check for the special Kong case, where you can take and draw int
-	 * count = 0; for (Tile t : tiles) { if (input.getValueIndex() ==
-	 * t.getValueIndex()) { count++; } } if (count == 3) { canTakeNew = true; return
-	 * true; }
-	 * 
-	 * // okay no kong so let's see if we have Pong or Chow Set tmpSet = new Set();
-	 * 
-	 * try { tmpSet.addTile(input);
-	 * 
-	 * for (int i = 0; i < numberOfTiles - 1; i++) { tmpSet.addTile(tiles.get(i));
-	 * tmpSet.addTile(tiles.get(i + 1)); if
-	 * (Set.isThreeConsecutive(tmpSet.getTiles()) ||
-	 * Set.isThreeOfAKind(tmpSet.getTiles())) { return true; } }
-	 * 
-	 * } catch (InvalidTileException e) { System.out.println(e.getMessage()); return
-	 * false; }
-	 * 
-	 * return false; }
-	 */
 }
