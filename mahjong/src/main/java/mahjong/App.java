@@ -16,22 +16,8 @@ public final class App {
     public static void main(String[] args) {
 
         Game g = new Game(true);
-
         g.run();
 
-        //g.printSets();
-
-        // initialize new test set
-        /*Set set = new Set();
-        if (set.readTiles()) {
-            if (set.isWinningSet())
-                System.out.println("Congratulations! The entered set is a winning set!");
-            else
-                System.out.println("Sadly, the entered set is not a winning set.");
-        } else
-            System.out.println("No valid set read, exiting.");
-        */
-    
     }
 
 }

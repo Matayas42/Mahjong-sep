@@ -141,7 +141,7 @@ public class Tile {
     }
 	
 	public boolean equals(Tile t){
-		return (this.getNumber() == t.getNumber() && this.getType().equals(t.getType()));
+		return (number == t.getNumber() && type.equals(t.getType()));
 	}
 
     // returns the shorthand for a tile like G1

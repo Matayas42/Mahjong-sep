@@ -6,13 +6,15 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Queue;
 import java.util.Random;
 import java.util.Scanner;
 
-class Game {
+public class Game {
 
     private final static int NO_OF_PLAYERS = 4;
     private final static String DATABASE_NAME = "database.txt";
@@ -26,6 +28,7 @@ class Game {
         setupDatabase();
 
         if (drawSets) {
+            System.out.println("Setup:");
             Random r = new Random();
             int houseIndex = r.nextInt(NO_OF_PLAYERS);
             for (int i = 0; i < NO_OF_PLAYERS; i++) {
@@ -83,8 +86,19 @@ class Game {
 
     // TODO were going to need user input here
     public boolean askStuffHere(String question) {
+
         System.out.println(question);
-        String tmp = sc.nextLine();
+        boolean validInput = false;
+        String tmp = "";
+
+        while (!validInput) {
+            tmp = sc.next();
+            if (tmp.equals("y") || tmp.equals("n")) {
+                validInput = true;
+            } else {
+                System.out.println("Invalid input.");
+            }
+        }
         if (tmp.equals("y"))
             return true;
         else
@@ -92,13 +106,22 @@ class Game {
     }
 
     // TODO input int
-    public int getNumberFromUser(String question) {
-        System.out.println(question);
+    public int getTileNumberFromUser(int maxInput) {
+
+        System.out.println("Which tile do you want to throw? Please enter number from 1 to " + maxInput + ".");
         int tmp = sc.nextInt();
-        return tmp;
+        while (true) {
+            if (tmp > 0 && tmp <= maxInput)
+                return tmp;
+            else {
+                System.out.println("Invalid input!");
+                tmp = sc.nextInt();
+            }
+        }
     }
 
     private void printCurrentSet(Set set) {
+
         System.out.println("Your current set:");
         System.out.println(" 1  2  3  4  5  6  7  8  9 10 11 12 13 14");
         set.print();
@@ -123,6 +146,19 @@ class Game {
         thrown.remove(tile);
     }
 
+    private void printThrownTiles(List<Tile> tTiles) {
+        
+        int i = 0;
+        System.out.print("Thrown tiles: ");
+        for (Tile t : tTiles) {
+            i++;
+            System.out.print(t.getShorthand());
+            if (i < tTiles.size())
+                System.out.print(",");
+        }
+        System.out.println();
+    }
+
     public void run() {
 
         boolean doRun = true;
@@ -130,14 +166,18 @@ class Game {
         Iterator<Set> it = sets.iterator();
         Set set = it.next();
         List<Tile> thrownTiles = new ArrayList<Tile>();
-        //int rCount = 1;
+        // int rCount = 1;
         boolean pkc = false;
+        boolean wasKong = false;
+        int i = 0;
 
         // FIRST ROUND: HOUSE TAKES ONE THROWS ONE
         while (!set.isHouse())
             set = it.next();
 
-        System.out.println("Player " + (set.getPlayerIndex() + 1) + " is the House.");
+        System.out.println("-------------------------------------------------------");
+        System.out.println("Player " + (set.getPlayerIndex() + 1) + " is the House. It is your turn Player "
+                + (set.getPlayerIndex() + 1) + ".");
 
         set.addRandomTiles(1);
         printCurrentSet(set);
@@ -148,79 +188,79 @@ class Game {
             winnerIndex = set.getPlayerIndex();
         } else {
 
-            thrownTiles.add(set.throwTile(getNumberFromUser(
-                    "Which tile do you want to throw? Please enter number from 1 to " + set.getNumberOfTiles() + ".")
-                    - 1));
+            thrownTiles.add(set.throwTile(getTileNumberFromUser(set.getNumberOfTiles()) - 1));
             printCurrentSet(set);
+            System.out.println("-------------------------------------------------------");
+            printThrownTiles(thrownTiles);
 
             // SECOND ROUND TIL INFINIY
             while (doRun) {
-                if (!it.hasNext())
-                    it = sets.iterator();
-                set = it.next();
-                //rCount++;
+                if (!wasKong) {
+                    if (!it.hasNext())
+                        it = sets.iterator();
+                    set = it.next();
+                } else
+                    wasKong = false;
+                // rCount++;
+                System.out.println("-------------------------------------------------------");
                 System.out.println("It is player " + (set.getPlayerIndex() + 1) + "'s turn!");
                 printCurrentSet(set);
+                i = 0;
+
                 // want to take the tile?
                 if (!thrownTiles.isEmpty()) {
-
-                    for (Tile t : thrownTiles) {
+                    for (Tile t : new ArrayList<Tile>(thrownTiles)) {
                         if (t.getPlayerIndex() == set.getPlayerIndex())
                             removeThrownTile(thrownTiles, t);
                         else {
                             if (set.canPong(t))
                                 if (askStuffHere("Do you want to Pong tile " + t.getShorthand() + "? (y/n)")) {
-                                    set.addTile(t, false);
-                                    thrownTiles.remove(t);
+                                    set.addTile(t, false, false);
+                                    //thrownTiles.remove(t);
                                     printCurrentSet(set);
-                                    thrownTiles.add(set.throwTile(getNumberFromUser(
-                                            "Which tile do you want to throw? Please enter number from 1 to "
-                                                    + set.getNumberOfTiles() + ".")
-                                            - 1));
                                     pkc = true;
                                     break;
                                 }
                             if (set.canKong(t))
                                 if (askStuffHere("Do you want to Kong tile " + t.getShorthand() + "? (y/n)")) {
-                                    set.addTile(t, false);
-                                    thrownTiles.remove(t);
-                                    set.addRandomTiles(1);
+                                    set.addTile(t, false, false);
+                                    //thrownTiles.remove(t);
                                     printCurrentSet(set);
-                                    thrownTiles.add(set.throwTile(getNumberFromUser(
-                                            "Which tile do you want to throw? Please enter number from 1 to "
-                                                    + set.getNumberOfTiles() + ".")
-                                            - 1));
                                     pkc = true;
+                                    wasKong = true;
                                     break;
                                 }
                         }
+                        i++;
                     }
-                    Tile t = thrownTiles.get(thrownTiles.size() - 1);
-                    if (set.canChow(t)) {
-                        if (askStuffHere("Do you want to Chow tile " + t.getShorthand() + "? (y/n)")) {
-                            set.addTile(t, false);
-                            thrownTiles.remove(t);
-                            printCurrentSet(set);
-                            thrownTiles.add(set.throwTile(
-                                    getNumberFromUser("Which tile do you want to throw? Please enter number from 1 to "
-                                            + set.getNumberOfTiles() + ".") - 1));
-                            pkc = true;
+                    if (!pkc) {
+                        Tile t = thrownTiles.get(thrownTiles.size() - 1);
+                        if (set.canChow(t)) {
+                            if (askStuffHere("Do you want to Chow tile " + t.getShorthand() + "? (y/n)")) {
+                                set.addTile(t, false, false);
+                                //thrownTiles.remove(t);
+                                printCurrentSet(set);
+                                pkc = true;
+                            }
                         }
+                    } else {
+                        thrownTiles.remove(i);
                     }
 
                 }
                 if (!pkc) {
                     set.addRandomTiles(1);
                     printCurrentSet(set);
-                    thrownTiles.add(set.throwTile(getNumberFromUser("Which tile do you want to throw? Please enter number from 1 to "
-                            + set.getNumberOfTiles() + ".") - 1));
                 } else
                     pkc = false;
 
                 if (set.isWinningSet()) {
                     winnerIndex = set.getPlayerIndex();
-                    doRun = false;
+                    break;
                 }
+                thrownTiles.add(set.throwTile(getTileNumberFromUser(set.getNumberOfTiles()) - 1));
+                System.out.println("-------------------------------------------------------");
+                printThrownTiles(thrownTiles);
             }
         }
 
