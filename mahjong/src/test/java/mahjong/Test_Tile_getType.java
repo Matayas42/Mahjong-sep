@@ -1,4 +1,4 @@
-package mahjong_test;
+package mahjong;
 
 import static org.junit.Assert.*;
 

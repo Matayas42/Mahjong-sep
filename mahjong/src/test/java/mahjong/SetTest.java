@@ -19,7 +19,7 @@ public class SetTest {
 	public void consecutive1() {
 		Set test = new Set();
 		test.fillSetFromString("D1,D2,D3");
-		boolean check = test.isThreeConsecutive(test.getTiles());
+		boolean check = Set.isThreeConsecutive(test.getTiles());
 		assertTrue(check);
 	}
 

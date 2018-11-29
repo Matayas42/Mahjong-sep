@@ -1,13 +1,9 @@
-package mahjong_test;
+package mahjong;
 
-import static org.junit.Assert.*;
-
-import java.util.List;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Before;
 import org.junit.Test;
-
-import mahjong.*;
 
 public class Test_dragonMolds {
 

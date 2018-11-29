@@ -1,10 +1,9 @@
 package mahjong;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class Test_isSmallWinds {
