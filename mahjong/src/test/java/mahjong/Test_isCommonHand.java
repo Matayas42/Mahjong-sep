@@ -1,4 +1,4 @@
-package mahjong;
+package mahjong_test;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -7,6 +7,8 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import mahjong.*;
 
 public class Test_isCommonHand {
 	
@@ -42,7 +44,7 @@ public class Test_isCommonHand {
 	}
 	
 	@Test
-	// confusing cases T -> F
+	// confusing cases T -> F, solved
 	public void commonHand3()  throws Exception {
 		Set test = new Set();
 		test.fillSetFromString("D1,D2,D3,B4,B5,B6,D1,D2,D3,C4,C5,C6,G1,G1");
@@ -81,10 +83,10 @@ public class Test_isCommonHand {
 	}
 	
 	@Test
-	// invalid number D10
+	// invalid number G10
 	public void commonHand6()  throws Exception {
 		Set test = new Set();
-		test.fillSetFromString("C1,C2,C3,B4,B5,B6,D2,D2,D3,C4,C5,C6,G1,G1");
+		test.fillSetFromString("C1,C2,C3,B4,B5,B6,D2,D2,D3,C4,C5,C6,G1,G10");
 		List<List<Meld>> listToTest = test.allPossibleHands(test.getTiles());
 		boolean check = false;
 		for (List<Meld> meldList : listToTest) {
