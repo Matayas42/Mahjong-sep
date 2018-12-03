@@ -1,4 +1,4 @@
-package mahjong;
+package mahjong_test;
 
 import static org.junit.Assert.*;
 
@@ -8,6 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import mahjong.Game;
+import mahjong.Meld;
 import mahjong.Set;
 
 public class Test_isGreatDragon {

@@ -1,4 +1,4 @@
-package mahjong;
+package mahjong_test;
 
 import static org.junit.Assert.*;
 
@@ -33,8 +33,16 @@ public class Test_checkPairFirst {
 	}
 	
 	@Test
-	// a pair found and does not run 2nd for loop
+	// consecutive found and run main loop
 	public void pairFirst3() {
+		Set test = new Set();
+		test.fillSetFromString("C1,C2,C4,C4,C3");
+		assertTrue(test.pairFirst());
+	}
+	
+	@Test
+	// a pair found and does not run 2nd for loop
+	public void pairFirst4() {
 		Set test = new Set();
 		test.fillSetFromString("C1,C1");
 		assertTrue(test.pairFirst());

@@ -1,4 +1,4 @@
-package mahjong;
+package mahjong_test;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -7,6 +7,10 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import mahjong.Game;
+import mahjong.Meld;
+import mahjong.Set;
 
 public class Test_isAllInTriplets {
 	
@@ -124,6 +128,19 @@ public class Test_isAllInTriplets {
 	public void AllInTripplets9() throws Exception{
 		Set test = new Set();
 		test.fillSetFromString("C5,C5,C5,D4,D4,D4,D4,D4,D4,W1,W1,W1,G2,G2");
+		List<List<Meld>> listToTest = test.allPossibleHands(test.getTiles());
+		boolean check = false;
+		for (List<Meld> meldList : listToTest) {
+			if(test.isAllInTripletts(meldList))check = true;
+		}
+		assertFalse(check);
+	}
+	
+	@Test
+	// chow -> false
+	public void AllInTripplets10() throws Exception{
+		Set test = new Set();
+		test.fillSetFromString("C5,C6,C7,D4,D5,D6,D4,D5,D6,W1,W2,W3,G2,G2");
 		List<List<Meld>> listToTest = test.allPossibleHands(test.getTiles());
 		boolean check = false;
 		for (List<Meld> meldList : listToTest) {

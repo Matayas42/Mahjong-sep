@@ -1,10 +1,13 @@
-package mahjong;
+package mahjong_test;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import mahjong.Game;
+import mahjong.Set;
 
 public class Test_isThreeConsecutive {
 
@@ -26,7 +29,7 @@ public class Test_isThreeConsecutive {
 	// return false
 	public void consecutive2() {
 		Set test = new Set();
-		test.fillSetFromString("B1,D2,D3");
+		test.fillSetFromString("B1,C2,D3");
 		boolean check = Set.isThreeConsecutive(test.getTiles());
 		assertFalse(check);
 	}
@@ -35,7 +38,7 @@ public class Test_isThreeConsecutive {
 	// return false
 	public void consecutive3() {
 		Set test = new Set();
-		test.fillSetFromString("B1,B2,C3");
+		test.fillSetFromString("B1,B2,D3");
 		boolean check = Set.isThreeConsecutive(test.getTiles());
 		assertFalse(check);
 	}

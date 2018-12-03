@@ -1,4 +1,4 @@
-package mahjong;
+package mahjong_test;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -7,6 +7,10 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import mahjong.Game;
+import mahjong.Meld;
+import mahjong.Set;
 
 public class Test_isSmallDragon {
 
