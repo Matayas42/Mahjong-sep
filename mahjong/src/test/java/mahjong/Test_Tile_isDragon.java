@@ -2,36 +2,23 @@ package mahjong_test;
 
 import static org.junit.Assert.*;
 
-import java.util.List;
-
-import org.junit.Before;
 import org.junit.Test;
 
 import mahjong.*;
 
 public class Test_Tile_isDragon {
 
-	@Before
-	public void setupBeforeClass() throws Exception {
-		Game g = new Game(false);
+	
+	@Test
+	public void dragon1() throws InvalidTileException {
+		Tile tile = new Tile('G',1);
+		assertTrue(tile.isDragon());
 	}
 	
 	@Test
-	// simply true
-	public void dragon1() {
-		Set test = new Set();
-		test.fillSetFromString("G1");
-		Tile t1 = test.getTileAt(0);
-		assertTrue(t1.isDragon());
-	}
-	
-	@Test
-	// simply false
-	public void dragon2() {
-		Set test = new Set();
-		test.fillSetFromString("D1");
-		Tile t2 = test.getTileAt(0);
-		assertFalse(t2.isDragon());
+	public void dragon2() throws InvalidTileException {
+		Tile tile = new Tile('C',1);
+		assertFalse(tile.isDragon());
 	}
 	
 }
