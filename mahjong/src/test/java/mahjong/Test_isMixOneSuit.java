@@ -32,15 +32,18 @@ public class Test_isMixOneSuit {
 	}
 	
 	@Test
-	// false cases; F -> T
+	// false cases
 	public void mixOneSuit2() throws Exception {
 		Set test = new Set();
-		test.fillSetFromString("B1,B1,B1,B2,B3,B4,W1,W1,W1,C4,C5,C6,B9,B9");
+		test.fillSetFromString("B1,B1,B1,C4,C5,C6,D2,D3,D4,W1,W1,W1,B9,B9");
 		List<List<Meld>> listToTest = test.allPossibleHands(test.getTiles());
 		boolean check = false;
 		for (List<Meld> meldList : listToTest) {
-			if(test.isMixOneSuit(meldList))check = true;
+			if(!test.isMixOneSuit(meldList)) {
+				check = test.isMixOneSuit(meldList);
+				break;
+			}
 		}
-		assertTrue(check);
+		assertFalse(check);
 	}
 }
