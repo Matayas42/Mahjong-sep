@@ -56,6 +56,10 @@ public class Tile {
         }
     }
 
+    public boolean checkTileValid(char inputType) {
+        return isInputTileValid(inputType);
+    }
+
     public static int getNumberRange(char inputType) {
         switch (inputType) {
         case 'D':

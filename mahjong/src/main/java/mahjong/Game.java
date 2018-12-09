@@ -6,11 +6,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Queue;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -22,6 +20,7 @@ public class Game {
     private File database;
     private List<Set> sets = new ArrayList<Set>();
     private Scanner sc = new Scanner(System.in);
+    boolean isTestCase = false;
 
     public Game(boolean drawSets) {
 
@@ -31,12 +30,32 @@ public class Game {
             System.out.println("Setup:");
             Random r = new Random();
             int houseIndex = r.nextInt(NO_OF_PLAYERS);
-            for (int i = 0; i < NO_OF_PLAYERS; i++) {
-                Set tmpSet = new Set(i);
-                tmpSet.addRandomTiles(13);
-                if (i == houseIndex)
+            isTestCase = askStuffHere("Test scenario? y/n");
+            if (!isTestCase) {
+                for (int i = 0; i < NO_OF_PLAYERS; i++) {
+                    Set tmpSet = new Set(i);
+                    tmpSet.addRandomTiles(13);
+                    if (i == houseIndex)
+                        tmpSet.setHouse();
+                    sets.add(tmpSet);
+                }
+            } else {
+                if (houseIndex == 0) {
+                    houseIndex = 1;
+                }
+                Set tmpSet = new Set(0);
+                tmpSet.fillSetFromString("D1,D1,D1,C2,C3,C4,B5,B5,B5,W1,W2,W3,G1");
+                if (0 == houseIndex)
                     tmpSet.setHouse();
                 sets.add(tmpSet);
+                for (int i = 1; i < 4; i++) {
+                    tmpSet = new Set(i);
+                    tmpSet.addRandomTiles(13);
+                    if (i == houseIndex)
+                        tmpSet.setHouse();
+                    sets.add(tmpSet);
+                }
+
             }
         }
 
@@ -147,7 +166,7 @@ public class Game {
     }
 
     private void printThrownTiles(List<Tile> tTiles) {
-        
+
         int i = 0;
         System.out.print("Thrown tiles: ");
         for (Tile t : tTiles) {
@@ -170,6 +189,7 @@ public class Game {
         boolean pkc = false;
         boolean wasKong = false;
         int i = 0;
+        int points = 0;
 
         // FIRST ROUND: HOUSE TAKES ONE THROWS ONE
         while (!set.isHouse())
@@ -216,7 +236,7 @@ public class Game {
                             if (set.canPong(t))
                                 if (askStuffHere("Do you want to Pong tile " + t.getShorthand() + "? (y/n)")) {
                                     set.addTile(t, false, false);
-                                    //thrownTiles.remove(t);
+                                    // thrownTiles.remove(t);
                                     printCurrentSet(set);
                                     pkc = true;
                                     break;
@@ -224,7 +244,7 @@ public class Game {
                             if (set.canKong(t))
                                 if (askStuffHere("Do you want to Kong tile " + t.getShorthand() + "? (y/n)")) {
                                     set.addTile(t, false, false);
-                                    //thrownTiles.remove(t);
+                                    // thrownTiles.remove(t);
                                     printCurrentSet(set);
                                     pkc = true;
                                     wasKong = true;
@@ -238,7 +258,7 @@ public class Game {
                         if (set.canChow(t)) {
                             if (askStuffHere("Do you want to Chow tile " + t.getShorthand() + "? (y/n)")) {
                                 set.addTile(t, false, false);
-                                //thrownTiles.remove(t);
+                                // thrownTiles.remove(t);
                                 printCurrentSet(set);
                                 pkc = true;
                             }
@@ -249,12 +269,25 @@ public class Game {
 
                 }
                 if (!pkc) {
-                    set.addRandomTiles(1);
-                    printCurrentSet(set);
+                    if (isTestCase && set.getPlayerIndex() == 0) {
+                        try {
+                            Tile test = new Tile('G', 1);
+                            set.addTile(test, false, false);
+                            printCurrentSet(set);
+                        } catch (Exception e) {
+                            // TODO: handle exception
+                        }
+
+                    } else {
+                        set.addRandomTiles(1);
+                        printCurrentSet(set);
+                    }
                 } else
                     pkc = false;
 
-                if (set.isWinningSet()) {
+                points = set.computeFanPoints();
+                if (points != 0) {
+                    
                     winnerIndex = set.getPlayerIndex();
                     break;
                 }
@@ -263,9 +296,9 @@ public class Game {
                 printThrownTiles(thrownTiles);
             }
         }
-
-        System.out.println("Player number " + (winnerIndex + 1) + " is the winner!");
-
+        System.out.println("-------------------------------------------------------");
+        System.out.println("Player number " + (winnerIndex + 1) + " is the winner!! Points: " + points);
+        System.out.println("-------------------------------------------------------");
         sc.close();
         database.delete();
 
