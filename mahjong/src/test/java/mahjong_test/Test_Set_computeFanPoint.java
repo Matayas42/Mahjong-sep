@@ -1,4 +1,4 @@
-package mahjong_test;
+package mahjong;
 
 import static org.junit.Assert.*;
 
@@ -8,7 +8,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import mahjong.*;
+import mahjong.Game;
+import mahjong.Set;
 
 public class Test_Set_computeFanPoint {
 
@@ -46,7 +47,7 @@ public class Test_Set_computeFanPoint {
 	public void computeFanPoint4() throws Exception {
 		Set test = new Set();
 		test.fillSetFromString("D1,D2,D3,B4,B5,B6,C1,C2,C3,C4,C5,C6,G1,G1");
-		assertEquals(1,test.computeFanPoints());
+		assertEquals(3,test.computeFanPoints());
 	}
 
 	@Test
@@ -90,11 +91,11 @@ public class Test_Set_computeFanPoint {
 	}
 	
 	@Test
-	// All Kongs, Max points
+	// Seven pairs, 4 points
 	public void computeFanPoint10() throws Exception {
 		Set test = new Set();
-		test.fillSetFromString("D1,D1,D1,D1,D2,D2,D2,D2,C3,C3,C3,C3,B7,B7,B7,B7,C1,C1");
-		assertEquals(10,test.computeFanPoints());
+		test.fillSetFromString("D1,D1,D3,D3,D2,D2,D4,D4,C8,C8,C3,C3,B7,B7");
+		assertEquals(4,test.computeFanPoints());
 	}
 	
 	@Test
