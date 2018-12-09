@@ -44,16 +44,16 @@ public class Test_isAllOrphans {
 	}
 	
 	@Test
-	// isEyes = 1 -> False
+	// Have Kong 
 	public void allOrphans3() throws Exception {
 		Set test = new Set();
-		test.fillSetFromString("D1,D1,D1,B1,B1,B1,C1,C1,C1,C9,C9,C9,G1,G2");
+		test.fillSetFromString("D1,D1,D1,B1,B1,B1,B1,C1,C1,C1,C9,C9,C9,G1,G1");
 		List<List<Meld>> listToTest = test.allPossibleHands(test.getTiles());
 		boolean check = false;
 		for (List<Meld> meldList : listToTest) {
 			if(test.isAllOrphans(meldList))check = true;
 		}
-		assertFalse(check);
+		assertTrue(check);
 	}
 	
 	// if Kong happens, melds != 4 

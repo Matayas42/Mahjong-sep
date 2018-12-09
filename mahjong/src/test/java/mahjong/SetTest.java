@@ -1,7 +1,6 @@
-package mahjong;
+package mahjong_test;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.List;
 
@@ -16,6 +15,41 @@ public class SetTest {
 	}
 
 	@Test
+	public void getTiles1() {
+		Set test = new Set();
+		test.fillSetFromString("D1,D2,D3");
+		assertNotNull(test.getTiles());
+	}
+	
+	@Test
+	public void setAndGetPlayerIndex1() {
+		Set test = new Set();
+		test.setPlayerIndex(1);
+		assertEquals(1,test.getPlayerIndex());
+	}
+	
+	@Test
+	public void setAndIsHouse1() {
+		Set test = new Set();
+		test.setHouse();
+		assertTrue(test.isHouse());
+	}
+	
+	@Test
+	public void getNumberOfTiles1() {
+		Set test = new Set();
+		test.fillSetFromString("D1,D2,D3");
+		assertEquals(3,test.getNumberOfTiles());
+	}
+	
+	@Test
+	public void getTileAt1() {
+		Set test = new Set();
+		test.fillSetFromString("D1,D2,D3");
+		assertNotNull(test.getTileAt(1));
+	}
+	
+	@Test
 	public void consecutive1() {
 		Set test = new Set();
 		test.fillSetFromString("D1,D2,D3");
@@ -28,7 +62,7 @@ public class SetTest {
 	public void commonHand1() {
 		Set test = new Set();
 		test.fillSetFromString("D1,D2,D3,D4,D5,D6,C1,C2,C3,C4,C5,C6,G1,G1");
-		assertTrue(test.isCommonHand());
+		assertTrue(test.isCommonHand(null));
 	}
 
 	//All in Trippletts
