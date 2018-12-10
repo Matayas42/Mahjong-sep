@@ -12,6 +12,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.Random;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.SynchronousQueue;
 
 public class Game extends Thread {
 
@@ -22,10 +25,10 @@ public class Game extends Thread {
 	private List<Set> sets = new ArrayList<Set>();
 	private boolean isTestCase = false;
 	private boolean inputNeeded = false;
-	private Queue<String> outputStrings;
-	private Queue<Integer> outputUsers;
+	private BlockingQueue<String> outputStrings;
+	private BlockingQueue<Integer> outputUsers;
 	private boolean newInput = false;
-	private String inputString = "";
+	private BlockingQueue<String> inputString;
 
 	public boolean isInputNeeded() {
 		return inputNeeded;
@@ -34,11 +37,11 @@ public class Game extends Thread {
 	public void setNewInput() {
 		newInput = true;
 	}
-	
+
 	public boolean isNewInput() {
 		return newInput;
 	}
-	
+
 	public boolean isInputStringEmpty() {
 		return inputString.isEmpty();
 	}
@@ -56,7 +59,11 @@ public class Game extends Thread {
 	}
 
 	public void setInputString(String input) {
-		inputString = input;
+		try {
+			inputString.put(input);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public Game(boolean drawSets) {
@@ -64,8 +71,9 @@ public class Game extends Thread {
 		setupDatabase();
 
 		if (drawSets) {
-			outputStrings = new LinkedList<String>();
-			outputUsers = new LinkedList<Integer>();
+			outputStrings = new LinkedBlockingQueue<String>();
+			outputUsers = new LinkedBlockingQueue<Integer>();
+			inputString = new SynchronousQueue<String>();
 			System.out.println("Setup:");
 			Random r = new Random();
 
@@ -155,21 +163,26 @@ public class Game extends Thread {
 		inputNeeded = true;
 		boolean validInput = false;
 		String tmpInput = "";
-		
+
 		while (!validInput) {
-			if (newInput) {
-				if (inputString.equals("y") || inputString.equals("n")) {
-					tmpInput = inputString;
+			// if (newInput) {
+			try {
+				tmpInput = inputString.take();
+				if (tmpInput.equals("y") || tmpInput.equals("n")) {
 					validInput = true;
 					inputNeeded = false;
 				} else {
 					addOutputString("Invalid input.", userId);
 				}
-				inputString = "";
-				newInput = false;
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
+
+			// newInput = !inputString.isEmpty();;
+			// }
 		}
-		
+
 		if (tmpInput.equals("y"))
 			return true;
 		else
@@ -184,22 +197,21 @@ public class Game extends Thread {
 		int tmpInt = -1;
 
 		while (true) {
-			if (newInput) {
+			// if (newInput) {
+			try {
+				tmpInt = Integer.parseInt(inputString.take());
 				inputNeeded = false;
-				try {
-					tmpInt = Integer.parseInt(inputString);
-					inputString = "";
-					if (tmpInt > 0 && tmpInt <= maxInput) {
-						newInput = false;
-						return tmpInt;
-					}
-				} catch (NumberFormatException ex) {
-					inputString = "";
+				if (tmpInt > 0 && tmpInt <= maxInput) {
+					newInput = false;
+					return tmpInt;
 				}
-				addOutputString("Invalid input!", userId);
+			} catch (Exception ex) {
+				// new try
 			}
+			addOutputString("Invalid input!", userId);
+			// }
 			inputNeeded = true;
-			newInput = !inputString.isEmpty();
+			// newInput = !inputString.isEmpty();
 		}
 	}
 
@@ -316,8 +328,8 @@ public class Game extends Thread {
 									wasKong = true;
 									break;
 								}
+							i++;
 						}
-						i++;
 					}
 					if (!pkc) {
 						Tile t = thrownTiles.get(thrownTiles.size() - 1);

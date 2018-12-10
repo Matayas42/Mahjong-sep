@@ -70,8 +70,8 @@ public class Server {
 				if (al.size() == 4) {
 					Game g = new Game(true);
 					g.start();
+					int currentUser = -1;
 					while (g.isAlive()) {
-						int currentUser = -1;
 						String currentMsg = "";
 						while (g.isOutputNeeded()) {
 							currentUser = g.getInteractUserId();
@@ -87,21 +87,20 @@ public class Server {
 								}
 							}
 						}
-						if (g.isInputNeeded() && !g.isNewInput() && g.isInputStringEmpty()) {
+						if (g.isInputNeeded()/* && !g.isNewInput() && g.isInputStringEmpty()*/) {
 							for (ClientThread thread : al) {
 								if (thread.id == currentUser) {
 									String tmpInput = "";
-									do {
-										tmpInput = thread.getUserInput();
-									} while (tmpInput.isEmpty());
-									g.setInputString(tmpInput);
-									g.setNewInput();
-									break;
+									tmpInput = thread.getUserInput();
+									if (!tmpInput.isEmpty())
+										g.setInputString(tmpInput);
+									//g.setNewInput();
 								}
 							}
 						}
 					}
 				}
+
 ////////////////////////////////////////////////////////////////////////////////////////				
 			}
 
@@ -275,7 +274,7 @@ public class Server {
 				switch (chitchat.getType()) {
 
 				case exchangingMsg.TALK:
-				// next line changed for Mahjong Game
+					// next line changed for Mahjong Game
 					userInput = message;
 					// broadcast(username + ": " + message);
 					break;

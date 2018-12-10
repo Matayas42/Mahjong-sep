@@ -726,16 +726,18 @@ public class Set {
 	}
 
 	public boolean canChow(Tile input) {
-		Set tmpSet = new Set();
-		tmpSet.addTile(input, false, false);
+		Set tmpSet;
 
 		for (int i = 0; i < numberOfTiles - 1; i++) {
+			tmpSet = new Set();
+			tmpSet.addTile(input, false, false);
 			tmpSet.addTile(tiles.get(i), false, false);
 			tmpSet.addTile(tiles.get(i + 1), false, false);
 			if (isThreeConsecutive(tmpSet.getTiles())) {
 				return true;
 			}
 		}
+		
 		return false;
 	}
 
@@ -743,7 +745,7 @@ public class Set {
 		int i = 0;
 
 		String output = "";
-		
+
 		for (Tile t : tiles) {
 			i++;
 			output = output + t.getShorthand();
