@@ -343,7 +343,7 @@ public class Game extends Thread {
 							}
 						}
 					} else {
-						thrownTiles.remove(i);
+						removeThrownTile(thrownTiles, thrownTiles.get(i));
 					}
 
 				}
