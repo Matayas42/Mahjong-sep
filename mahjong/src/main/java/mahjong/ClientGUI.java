@@ -100,9 +100,9 @@ public class ClientGUI extends JFrame implements ActionListener {
 		connected = false;
 	}
 	
-	public static void main(String arg[]) 
+	/*public static void main(String arg[]) 
 	{
-		new ClientGUI("localhost", 1500);	}
+		new ClientGUI("localhost", 1500);	}*/
 	/*
 	* Button or JTextField clicked
 	*/

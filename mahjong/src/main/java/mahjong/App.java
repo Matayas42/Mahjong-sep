@@ -9,15 +9,14 @@ public final class App {
     }
 
     /**
-     * Mahjong main
+     * Legacy Mahjong main
      * 
      * @param args The arguments of the program. arguments of the program.
      */
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
 
         Game g = new Game(true);
         g.run();
 
-    }
-
+    }*/
 }
