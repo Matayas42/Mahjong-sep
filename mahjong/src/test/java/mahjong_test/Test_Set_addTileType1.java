@@ -1,8 +1,9 @@
-package mahjong_test;
+package mahjong;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import mahjong.Game;
@@ -50,20 +51,6 @@ public class Test_Set_addTileType1 {
 		test.fillSetFromString("D1,D2,D3");
 		Tile tile = new Tile('C',1);
 		boolean check = test.addTile(tile,true,false);
-		assertTrue(check);
-	}
-	
-	@Test
-	public void addTileType1_5() throws Exception {
-		class SetStub extends Set {
-			   private boolean checkDataBase(Tile tile) throws InvalidTileException{
-			       throw new InvalidTileException(tile.getType(), tile.getNumber());
-			   } 
-		}
-		SetStub test = new SetStub();
-		test.fillSetFromString("D1,D2,D3");
-		Tile tile = new Tile('C',1);
-		boolean check = test.addTile(tile,true,true);
 		assertTrue(check);
 	}
 	

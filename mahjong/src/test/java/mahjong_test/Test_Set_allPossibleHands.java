@@ -1,15 +1,12 @@
-package mahjong_test;
+package mahjong;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 import java.util.List;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
-
-import mahjong.Game;
-import mahjong.Meld;
-import mahjong.Set;
 
 public class Test_Set_allPossibleHands {
 

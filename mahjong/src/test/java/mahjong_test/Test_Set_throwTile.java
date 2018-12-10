@@ -1,4 +1,4 @@
-package mahjong_test;
+package mahjong;
 
 import static org.junit.Assert.*;
 
@@ -8,7 +8,9 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import mahjong.*;
+import mahjong.Game;
+import mahjong.Set;
+import mahjong.Tile;
 
 public class Test_Set_throwTile {
 

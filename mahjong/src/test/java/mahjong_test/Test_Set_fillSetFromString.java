@@ -1,14 +1,10 @@
-package mahjong_test;
+package mahjong;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
-
-import mahjong.Game;
-import mahjong.Set;
-
 
 public class Test_Set_fillSetFromString {
 
