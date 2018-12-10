@@ -739,19 +739,21 @@ public class Set {
 		return false;
 	}
 
-	public void print() {
+	public String print() {
 		int i = 0;
 
+		String output = "";
+		
 		for (Tile t : tiles) {
 			i++;
-			System.out.print(t.getShorthand());
+			output = output + t.getShorthand();
 			if (i < numberOfTiles)
-				System.out.print(",");
+				output = output + ",";
 		}
 		if (i == 0)
-			System.out.println("Currently no thrown tiles.");
+			output = "Currently no thrown tiles.";
 
-		System.out.println();
+		return output;
 	}
 
 }
