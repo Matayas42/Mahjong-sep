@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
+// unchanged source taken from CS3201 project
 /*
  * The server as a GUI
  */

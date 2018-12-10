@@ -7,6 +7,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel; 
 
+// unchanged source taken from CS3201 project
 public class exchangingMsg  implements Serializable {
 
 	/**

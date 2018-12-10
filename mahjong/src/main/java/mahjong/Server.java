@@ -5,6 +5,8 @@ import java.net.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+// most source taken from CS3201 project
+// added code is marked with comments
 /*
  * The server that can be run both as a console application or a GUI
  */
@@ -62,7 +64,9 @@ public class Server {
 				ClientThread t = new ClientThread(socket); // make a thread of it
 				al.add(t); // save it in the ArrayList
 				t.start();
-
+///////////////////////////////////////////////////////////////////////////////////////
+// CODE ADDED FOR MAHJONG GAME
+///////////////////////////////////////////////////////////////////////////////////////
 				if (al.size() == 4) {
 					Game g = new Game(true);
 					g.start();
@@ -98,6 +102,7 @@ public class Server {
 						}
 					}
 				}
+////////////////////////////////////////////////////////////////////////////////////////				
 			}
 
 			try {
@@ -270,6 +275,7 @@ public class Server {
 				switch (chitchat.getType()) {
 
 				case exchangingMsg.TALK:
+				// next line changed for Mahjong Game
 					userInput = message;
 					// broadcast(username + ": " + message);
 					break;

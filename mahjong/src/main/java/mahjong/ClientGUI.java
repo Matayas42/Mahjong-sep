@@ -4,6 +4,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
+// almost unchanged source taken from CS3201 project
+// only font for JTextArea changed
 public class ClientGUI extends JFrame implements ActionListener {
     private static final long serialVersionUID = 1L;
 
