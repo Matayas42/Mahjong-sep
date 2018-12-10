@@ -6,6 +6,11 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import mahjong.Game;
+import mahjong.InvalidTileException;
+import mahjong.Set;
+import mahjong.Tile;
+
 public class Test_Set_addTileType2 {
 
 	@Before
